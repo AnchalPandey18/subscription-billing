@@ -1,4 +1,5 @@
 import authRoutes from "./routes/authRoutes.js";
+import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -10,7 +11,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRoutes);
-
+app.use("/api/subscriptions", subscriptionRoutes);
 app.get("/", (req, res) => {
     res.json({
         message: "Subscription Billing API is running"

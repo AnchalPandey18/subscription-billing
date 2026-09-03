@@ -1,5 +1,7 @@
 import authRoutes from "./routes/authRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
+import invoiceRoutes from "./routes/invoiceRoutes.js";
+import creditNoteRoutes from "./routes/creditNoteRoutes.js";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -12,6 +14,9 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/invoices", invoiceRoutes);
+app.use("/api/credit-notes", creditNoteRoutes);
+
 app.get("/", (req, res) => {
     res.json({
         message: "Subscription Billing API is running"
@@ -25,3 +30,9 @@ connectDB();
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
+
+
+
+
+

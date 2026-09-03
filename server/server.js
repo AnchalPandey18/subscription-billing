@@ -2,6 +2,7 @@ import authRoutes from "./routes/authRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 import invoiceRoutes from "./routes/invoiceRoutes.js";
 import creditNoteRoutes from "./routes/creditNoteRoutes.js";
+import collaboratorRoutes from "./routes/collaboratorRoutes.js";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -16,6 +17,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/credit-notes", creditNoteRoutes);
+app.use("/api/collaborators", collaboratorRoutes);
 
 app.get("/", (req, res) => {
     res.json({

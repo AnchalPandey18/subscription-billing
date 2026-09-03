@@ -392,3 +392,168 @@ export const bulkGenerateInvoices = async (req, res) => {
         });
     }
 };
+
+// Export Invoices as CSV
+export const exportInvoicesCSV = async (req, res) => {
+    try {
+        const {
+            search = "",
+            status,
+            fromDate,
+            toDate
+        } = req.query;
+
+        const query = {};
+
+        // Search
+        if (search.trim()) {
+            query.$or = [
+                {
+                    invoiceNumber: {
+                        $regex: search.trim(),
+                        $options: "i"
+                    }
+                },
+                {
+                    customerName: {
+                        $regex: search.trim(),
+                        $options: "i"
+                    }
+                },
+                {
+                    customerEmail: {
+                        $regex: search.trim(),
+                        $options: "i"
+                    }
+                }
+            ];
+        }
+
+        // Status filter
+        if (status) {
+            const allowedStatuses = [
+                "Draft",
+                "Issued",
+                "Paid",
+                "Void"
+            ];
+
+            if (!allowedStatuses.includes(status)) {
+                return res.status(400).json({
+                    message: "Invalid invoice status"
+                });
+            }
+
+            query.status = status;
+        }
+
+        // Date filter
+        if (fromDate || toDate) {
+            query.issueDate = {};
+
+            if (fromDate) {
+                const startDate = new Date(fromDate);
+
+                if (isNaN(startDate.getTime())) {
+                    return res.status(400).json({
+                        message: "Invalid fromDate"
+                    });
+                }
+
+                query.issueDate.$gte = startDate;
+            }
+
+            if (toDate) {
+                const endDate = new Date(toDate);
+
+                if (isNaN(endDate.getTime())) {
+                    return res.status(400).json({
+                        message: "Invalid toDate"
+                    });
+                }
+
+                endDate.setHours(23, 59, 59, 999);
+
+                query.issueDate.$lte = endDate;
+            }
+        }
+
+        const invoices = await Invoice.find(query)
+            .populate("subscriptionId")
+            .populate("createdBy", "name email role")
+            .sort({ issueDate: -1 });
+
+        // CSV header
+        const csvRows = [];
+
+        csvRows.push([
+            "Invoice Number",
+            "Customer Name",
+            "Customer Email",
+            "Amount",
+            "Currency",
+            "Issue Date",
+            "Due Date",
+            "Status"
+        ].join(","));
+
+        // CSV data
+        invoices.forEach((invoice) => {
+            csvRows.push([
+                invoice.invoiceNumber,
+                `"${invoice.customerName}"`,
+                invoice.customerEmail,
+                invoice.amount.toString(),
+                invoice.currency,
+                invoice.issueDate.toISOString().split("T")[0],
+                invoice.dueDate.toISOString().split("T")[0],
+                invoice.status
+            ].join(","));
+        });
+
+        const csv = csvRows.join("\n");
+
+        res.setHeader("Content-Type", "text/csv");
+        res.setHeader(
+            "Content-Disposition",
+            "attachment; filename=invoices.csv"
+        );
+
+        res.send(csv);
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to export invoices",
+            error: error.message
+        });
+    }
+};
+
+
+// Get Overdue Invoices
+export const getOverdueInvoices = async (req, res) => {
+    try {
+        const today = new Date();
+
+        today.setHours(0, 0, 0, 0);
+
+        const overdueInvoices = await Invoice.find({
+            status: "Issued",
+            dueDate: { $lt: today }
+        })
+            .populate("subscriptionId")
+            .populate("createdBy", "name email role")
+            .sort({ dueDate: 1 });
+
+        res.json({
+            overdueInvoices,
+            count: overdueInvoices.length
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to fetch overdue invoices",
+            error: error.message
+        });
+    }
+};

@@ -3,6 +3,7 @@ import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 import invoiceRoutes from "./routes/invoiceRoutes.js";
 import creditNoteRoutes from "./routes/creditNoteRoutes.js";
 import collaboratorRoutes from "./routes/collaboratorRoutes.js";
+import overdueAlertRoutes from "./routes/overdueAlertRoutes.js";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -18,6 +19,7 @@ app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/credit-notes", creditNoteRoutes);
 app.use("/api/collaborators", collaboratorRoutes);
+app.use("/api/overdue-alerts", overdueAlertRoutes);
 
 app.get("/", (req, res) => {
     res.json({

@@ -6,7 +6,9 @@ import {
     issueInvoice,
     payInvoice,
     voidInvoice,
-    bulkGenerateInvoices
+    bulkGenerateInvoices,
+    exportInvoicesCSV,
+     getOverdueInvoices
 } from "../controllers/invoiceController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -29,6 +31,13 @@ router.get(
     authorizeRoles("Billing Admin", "Account Manager"),
     getInvoices
 );
+// Export invoices as CSV
+router.get(
+    "/export",
+    authMiddleware,
+    authorizeRoles("Billing Admin", "Account Manager"),
+    exportInvoicesCSV
+);
 
     // Bulk generate invoices
 router.post(
@@ -36,6 +45,14 @@ router.post(
     authMiddleware,
     authorizeRoles("Billing Admin"),
     bulkGenerateInvoices
+);
+
+// Get overdue invoices
+router.get(
+    "/overdue",
+    authMiddleware,
+    authorizeRoles("Billing Admin", "Account Manager"),
+    getOverdueInvoices
 );
 
 // Issue invoice

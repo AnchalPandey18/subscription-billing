@@ -174,3 +174,221 @@ export const voidInvoice = async (req, res) => {
         });
     }
 };
+
+// Get Invoices with Search, Filter and Pagination
+export const getInvoices = async (req, res) => {
+    try {
+        const {
+            search = "",
+            status,
+            fromDate,
+            toDate,
+            page = 1,
+            limit = 10
+        } = req.query;
+
+        const currentPage = Math.max(Number(page), 1);
+        const perPage = Math.min(Math.max(Number(limit), 1), 100);
+
+        const query = {};
+
+        // Search
+        if (search.trim()) {
+            query.$or = [
+                {
+                    invoiceNumber: {
+                        $regex: search.trim(),
+                        $options: "i"
+                    }
+                },
+                {
+                    customerName: {
+                        $regex: search.trim(),
+                        $options: "i"
+                    }
+                },
+                {
+                    customerEmail: {
+                        $regex: search.trim(),
+                        $options: "i"
+                    }
+                }
+            ];
+        }
+
+        // Status filter
+        if (status) {
+            const allowedStatuses = [
+                "Draft",
+                "Issued",
+                "Paid",
+                "Void"
+            ];
+
+            if (!allowedStatuses.includes(status)) {
+                return res.status(400).json({
+                    message: "Invalid invoice status"
+                });
+            }
+
+            query.status = status;
+        }
+
+        // Date filter
+        if (fromDate || toDate) {
+            query.issueDate = {};
+
+            if (fromDate) {
+                const startDate = new Date(fromDate);
+
+                if (isNaN(startDate.getTime())) {
+                    return res.status(400).json({
+                        message: "Invalid fromDate"
+                    });
+                }
+
+                query.issueDate.$gte = startDate;
+            }
+
+            if (toDate) {
+                const endDate = new Date(toDate);
+
+                if (isNaN(endDate.getTime())) {
+                    return res.status(400).json({
+                        message: "Invalid toDate"
+                    });
+                }
+
+                endDate.setHours(23, 59, 59, 999);
+
+                query.issueDate.$lte = endDate;
+            }
+        }
+
+        const skip = (currentPage - 1) * perPage;
+
+        const invoices = await Invoice.find(query)
+            .populate("subscriptionId")
+            .populate("createdBy", "name email role")
+            .sort({ issueDate: -1 })
+            .skip(skip)
+            .limit(perPage);
+
+        const totalInvoices = await Invoice.countDocuments(query);
+
+        const totalPages = Math.ceil(totalInvoices / perPage);
+
+        res.json({
+            invoices,
+            pagination: {
+                currentPage,
+                perPage,
+                totalInvoices,
+                totalPages
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to fetch invoices",
+            error: error.message
+        });
+    }
+};
+
+// Bulk Generate Invoices
+export const bulkGenerateInvoices = async (req, res) => {
+    try {
+        const now = new Date();
+
+        // Find active subscriptions whose billing date has arrived
+        const subscriptions = await Subscription.find({
+            status: "Active",
+            nextBillingDate: { $lte: now }
+        });
+
+        const createdInvoices = [];
+        const skippedSubscriptions = [];
+        const errors = [];
+
+        for (const subscription of subscriptions) {
+            try {
+                const billingDate = new Date(subscription.nextBillingDate);
+
+                // Check if invoice already exists for this billing date
+                const existingInvoice = await Invoice.findOne({
+                    subscriptionId: subscription._id,
+                    dueDate: billingDate
+                });
+
+                if (existingInvoice) {
+                    skippedSubscriptions.push({
+                        subscriptionId: subscription._id,
+                        reason: "Invoice already exists for this billing period"
+                    });
+
+                    continue;
+                }
+
+                // Generate a unique invoice number
+                const invoiceNumber =
+                    `INV-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+
+                const invoice = await Invoice.create({
+                    invoiceNumber,
+                    subscriptionId: subscription._id,
+                    customerName: subscription.customerName,
+                    customerEmail: subscription.customerEmail,
+                    amount: subscription.amount,
+                    currency: subscription.currency,
+                    dueDate: billingDate,
+                    createdBy: req.user.userId
+                });
+
+                createdInvoices.push(invoice);
+
+                // Move subscription to next billing date
+                const nextBillingDate = new Date(billingDate);
+
+                if (subscription.billingCycle === "Monthly") {
+                    nextBillingDate.setMonth(
+                        nextBillingDate.getMonth() + 1
+                    );
+                } else if (subscription.billingCycle === "Yearly") {
+                    nextBillingDate.setFullYear(
+                        nextBillingDate.getFullYear() + 1
+                    );
+                }
+
+                subscription.nextBillingDate = nextBillingDate;
+
+                await subscription.save();
+
+            } catch (error) {
+                errors.push({
+                    subscriptionId: subscription._id,
+                    message: error.message
+                });
+            }
+        }
+
+        res.status(200).json({
+            message: "Bulk invoice generation completed",
+            summary: {
+                totalSubscriptions: subscriptions.length,
+                invoicesCreated: createdInvoices.length,
+                subscriptionsSkipped: skippedSubscriptions.length,
+                errors: errors.length
+            },
+            createdInvoices,
+            skippedSubscriptions,
+            errors
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Bulk invoice generation failed",
+            error: error.message
+        });
+    }
+};

@@ -4,18 +4,18 @@
 
 Subscription Billing System
 
-## How I am building the project
+## How I built the project
 
-I am building the project step by step instead of trying to complete everything at once.
+I built the project step by step instead of trying to complete everything at once.
 
-For each major feature, I will first implement it, test it, fix any issues, and then commit the changes to GitHub. This will also help me keep track of my progress.
+For each major feature, I implemented it, tested it, fixed issues where needed, and then committed the changes to GitHub. This made it easier to track the development and keep the project stable while adding new features.
 
-My basic workflow is:
+My basic workflow was:
 
-1. Decide what feature I need to build
+1. Decide what feature I needed to build
 2. Implement it
 3. Test it
-4. Fix errors if there are any
+4. Fix errors if there were any
 5. Update the documentation when needed
 6. Commit the changes
 7. Push the changes to GitHub
@@ -25,14 +25,14 @@ My basic workflow is:
 
 ## 1. Project Setup
 
-First, I set up the basic project structure.
+I started by setting up the basic project structure.
 
 I worked on:
 
 - Creating the React frontend using Vite
 - Creating the Node.js/Express backend
 - Setting up ES Modules
-- Installing the required backend packages
+- Installing the required packages
 - Creating folders for controllers, models, routes, middleware and configuration
 - Creating the documentation files
 - Setting up Git and GitHub
@@ -47,18 +47,18 @@ I worked on:
 
 ## 2. MongoDB Setup
 
-After setting up the backend, I connected the application with MongoDB Atlas.
+I connected the backend with MongoDB Atlas and kept the database configuration in environment variables.
 
 I worked on:
 
 - Creating the MongoDB connection
-- Adding the MongoDB connection string to `.env`
-- Keeping sensitive information out of GitHub
-- Testing whether the backend can connect to MongoDB
+- Connecting the Express server with MongoDB
+- Keeping sensitive configuration outside GitHub
+- Testing the database connection
 
 **Status:** Completed
 
-**Estimated time:** 20min
+**Estimated time:** 20 min
 
 **Actual time:** 30 min
 
@@ -66,7 +66,7 @@ I worked on:
 
 ## 3. Authentication
 
-Next, I worked on user authentication.
+I implemented user authentication before building the main billing features.
 
 I implemented:
 
@@ -77,237 +77,269 @@ I implemented:
 - JWT token generation
 - JWT authentication middleware
 - Protected `/me` route
-- Testing registration and login APIs
+- Authentication testing
 
-The reason I implemented authentication before the main billing features is that the application needs to know which user is making a request.
+Authentication was implemented early because the application needs to know which user is making each request.
 
 **Status:** Completed
 
-**Estimated time:** 
+**Estimated time:** 1 hour
 
-**Actual time:** ___
+**Actual time:** 1 hour 15 min
 
 ---
 
 ## 4. Role-Based Authorization
 
-The application has two main roles:
+The application supports two roles:
 
 - Billing Admin
 - Account Manager
 
-I will implement role-based middleware so that the backend can decide whether a user is allowed to perform a particular operation.
+I added role-based middleware to control access to different backend operations.
 
-I will also test that users cannot access operations that are not allowed for their role.
+I also tested unauthorized operations to make sure users cannot bypass permissions by directly calling the API.
 
-**Status:** In Progress
+**Status:** Completed
 
-**Estimated time:** ___
+**Estimated time:** 45 min
 
-**Actual time:** ___
+**Actual time:** 1 hour
 
 ---
 
 ## 5. Subscription Management
 
-After authentication and authorization, I will work on subscriptions.
+I implemented the main subscription functionality.
 
-I plan to implement:
+This includes:
 
-- Subscription model
 - Creating subscriptions
 - Updating subscriptions
-- Subscription status
+- Viewing subscriptions
+- Active and Archived status
 - Archiving subscriptions
-- Making sure archived subscriptions do not create new invoices
-- Keeping old invoices available even after a subscription is archived
+- Restricting changes to archived subscriptions
+- Preventing archived subscriptions from generating new invoices
+- Keeping previous invoices available after archiving
 
-**Status:** Not Started
+**Status:** Completed
 
-**Estimated time:** ___
+**Estimated time:** 1 hour 15 min
 
-**Actual time:** ___
+**Actual time:** 1 hour 30 min
 
 ---
 
 ## 6. Collaborators
 
-Next, I will add collaborator functionality.
+I added collaborator management for subscriptions.
 
-I will work on:
+I implemented:
 
 - Adding collaborators
-- Connecting collaborators with the required accounts/subscriptions
-- Applying the required permissions
-- Testing collaborator access
+- Viewing collaborators
+- Removing collaborators
+- Preventing duplicate collaborators
+- Validating subscriptions and users
+- Applying authentication and role checks
 
-**Status:** Not Started
+**Status:** Completed
 
-**Estimated time:** ___
+**Estimated time:** 45 min
 
-**Actual time:** ___
+**Actual time:** 1 hour
 
 ---
 
 ## 7. Invoice Management
 
-This will be one of the main parts of the project.
+Invoice management was one of the main parts of the project.
 
-I will implement:
+I implemented:
 
-- Invoice model
 - Invoice creation
 - Invoice generation from subscriptions
-- Invoice status
+- Invoice numbers
+- Draft, Issued, Paid and Void states
 - Draft → Issued → Paid flow
 - Draft/Issued → Void flow
-- Relationship between invoices and subscriptions
-- Using MongoDB Decimal128 for money values
+- Invoice and subscription relationship
+- MongoDB Decimal128 for monetary values
+- Validation for invoice operations
 
-**Status:** Not Started
+**Status:** Completed
 
-**Estimated time:** ___
+**Estimated time:** 2 hours
 
-**Actual time:** ___
+**Actual time:** 2 hours 15 min
 
 ---
 
 ## 8. Paid Invoice Protection and Credit Notes
 
-I will make sure that a paid invoice cannot simply be edited or deleted.
+I made paid invoices immutable.
 
-For corrections to paid invoices, I will use credit notes instead of changing the original financial record.
+Instead of modifying a paid invoice, corrections are handled through credit notes.
 
-I will also make sure that the invoice history remains available for auditing.
+I implemented:
 
-**Status:** Not Started
+- Credit note creation
+- Credit note validation
+- Cumulative credit amount validation
+- Preventing credits greater than the invoice amount
+- Restricting credit notes to paid invoices
+- Role-based access for credit notes
 
-**Estimated time:** ___
+This keeps the original paid invoice available as part of the billing history.
 
-**Actual time:** ___
+**Status:** Completed
+
+**Estimated time:** 1 hour
+
+**Actual time:** 1 hour 15 min
 
 ---
 
 ## 9. Search, Filters and Pagination
 
-Once the main billing features are working, I will add:
+I added invoice listing features to make the invoice registry easier to use.
 
-- Search
-- Filters
+I implemented:
+
+- Search by invoice number
+- Search by customer name
+- Search by customer email
+- Status filtering
+- Date range filtering
 - Pagination
-- Appropriate database queries
+- Sorting by issue date
+- Backend query handling
 
-I will also consider how these queries will behave when the amount of data becomes much larger.
+**Status:** Completed
 
-**Status:** Not Started
+**Estimated time:** 1 hour
 
-**Estimated time:** ___
-
-**Actual time:** ___
+**Actual time:** 1 hour
 
 ---
 
 ## 10. Bulk Operations and CSV
 
-I will then work on the bulk operations required by the assessment.
+I implemented the bulk billing operations required by the project.
 
 This includes:
 
-- Bulk invoice generation where required
-- CSV export
-- Validation
-- Error handling
+- Bulk invoice generation
+- Checking subscriptions that are due for billing
+- Preventing duplicate invoices for the same billing period
+- Moving the next billing date forward
+- Reporting created, skipped and failed operations
+- CSV invoice export
+- Applying invoice filters to CSV export
 
-**Status:** Not Started
+**Status:** Completed
 
-**Estimated time:** ___
+**Estimated time:** 1 hour 15 min
 
-**Actual time:** ___
+**Actual time:** 1 hour 30 min
 
 ---
 
 ## 11. Dashboard and Overdue Invoices
 
-After the core billing functionality is complete, I will build the dashboard.
+I built the dashboard to provide a quick overview of billing activity.
 
-The dashboard will show useful information such as:
+The dashboard includes information such as:
 
-- Subscriptions
-- Invoices
-- Paid invoices
+- Total subscriptions
+- Invoice information
+- Collected revenue
+- Receivables
 - Overdue invoices
-- Other important billing information
+- Invoice status breakdown
+- Active plan information
+- Revenue information
 
-I will also add overdue invoice alerts where required.
+I also implemented overdue invoice handling.
 
-**Status:** Not Started
+Overdue invoices are derived from an issued invoice whose due date has passed. I also added dismissible overdue alerts while keeping the alert capable of appearing again if the invoice becomes overdue after its due date changes.
 
-**Estimated time:** ___
+**Status:** Completed
 
-**Actual time:** ___
+**Estimated time:** 2 hours
+
+**Actual time:** 2 hours 30 min
 
 ---
 
 ## 12. Frontend
 
-After the backend APIs are working properly, I will connect them with the React frontend.
+After the backend APIs were working, I connected them with the React frontend.
 
-I will build:
+I implemented:
 
 - Login page
 - Registration page
 - Dashboard
-- Subscription pages
-- Invoice pages
-- Required forms
-- Protected routes
+- Subscription page
+- Invoice page
+- Navigation/sidebar
+- Protected application flow
 - Role-based UI
+- Invoice actions
+- Bulk generation interface
+- Overdue alert interface
 
-I will keep the UI simple and focus first on making the main workflows work correctly.
+I focused on keeping the interface clean and practical while making the main billing workflows easy to use.
 
-**Status:** Not Started
+**Status:** In Progress
 
-**Estimated time:** ___
+**Estimated time:** 3 hours
 
-**Actual time:** ___
+**Actual time:** 2 hours 30 min
 
 ---
 
 ## 13. Testing
 
-Before deployment, I will test the complete application.
+I tested the important backend and frontend workflows while building the features instead of waiting until the end.
 
-I will test:
+I tested:
 
 - Registration
 - Login
 - JWT authentication
 - Role permissions
 - Subscription operations
+- Archiving subscriptions
 - Invoice creation
-- Invoice status changes
-- Paid invoice immutability
+- Invoice lifecycle
+- Paid invoice protection
 - Credit notes
 - Search and filters
 - Pagination
-- Bulk operations
+- Bulk invoice generation
+- CSV export
+- Overdue invoices
+- Overdue alert dismissal
 - Error cases
 
-I will fix important issues found during testing.
+I also tested the application through the frontend after connecting the APIs.
 
-**Status:** Not Started
+**Status:** In Progress
 
-**Estimated time:** ___
+**Estimated time:** 2 hours
 
-**Actual time:** ___
+**Actual time:** 1 hour 45 min
 
 ---
 
 ## 14. Documentation and Deployment
 
-At the end, I will complete the remaining documentation and deploy the application.
+I am completing the project documentation alongside the final development work.
 
-I will complete:
+The documentation includes:
 
 - `architecture.md`
 - `schema.md`
@@ -316,28 +348,28 @@ I will complete:
 - `ai-prompts.md`
 - `Submission.md`
 
-I will then:
+The remaining deployment work includes:
 
-- Deploy the backend
-- Deploy the frontend
-- Configure production environment variables
-- Connect the deployed application to MongoDB Atlas
-- Test the live application
-- Check the GitHub repository before submission
+- Deploying the backend
+- Deploying the frontend
+- Configuring production environment variables
+- Connecting the deployed application to MongoDB Atlas
+- Testing the live application
+- Final GitHub repository check
 
-**Status:** Not Started
+**Status:** In Progress
 
-**Estimated time:** ___
+**Estimated time:** 2 hours
 
-**Actual time:** ___
+**Actual time:** 1 hour
 
 ---
 
-## What I will prioritize if I run short on time
+## What I prioritized when managing time
 
-My first priority will be getting the main billing workflow working correctly.
+My main priority was to make the core billing workflow work correctly before spending too much time on visual details.
 
-The most important features are:
+The priority was:
 
 1. Authentication
 2. Role-based authorization
@@ -345,15 +377,23 @@ The most important features are:
 4. Invoice generation
 5. Invoice lifecycle
 6. Paid invoice protection
-7. Core frontend
-8. Database integration
-9. Testing
-10. Deployment
+7. Credit notes
+8. Search and filtering
+9. Bulk operations
+10. Dashboard and frontend
+11. Testing
+12. Documentation and deployment
 
-I will give less priority to things like animations and extra UI styling if there is not enough time.
+I kept animations and unnecessary UI complexity low so that more time could be spent on the actual billing logic and permissions.
 
 ---
 
 ## Changes During Development
 
-I will update this section if my actual development process or build order changes while working on the project.
+The original development order changed slightly as the project grew.
+
+I initially planned to complete most backend features before starting the frontend. In practice, I started connecting the frontend once the important backend APIs were stable. This helped me find integration issues earlier and allowed me to verify the complete user workflow.
+
+I also added seed data for the Billing Admin and Account Manager accounts to make role-based testing easier.
+
+The main feature priorities remained the same throughout development, with additional time spent on invoice lifecycle rules, credit notes, bulk generation and overdue handling because these were important parts of the billing workflow.

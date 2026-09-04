@@ -1,67 +1,68 @@
-import { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import useAuth from "./context/useAuth";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import Subscriptions from "./pages/Subscriptions";
+import Invoices from "./pages/Invoices";
+import CreditNotes from "./pages/CreditNotes";
+import Collaborators from "./pages/Collaborators";
+import OverdueAlerts from "./pages/OverdueAlerts";
 
-function App() {
-    const [isLoggedIn, setIsLoggedIn] = useState(
-        !!localStorage.getItem("token")
-    );
-
-    if (!isLoggedIn) {
-        return (
-            <Routes>
-                <Route
-                    path="/login"
-                    element={
-                        <Login
-                            onCreateAccount={() =>
-                                window.location.href = "/register"
-                            }
-                            onLogin={() => setIsLoggedIn(true)}
-                        />
-                    }
-                />
-
-                <Route
-                    path="/register"
-                    element={
-                        <Register
-                            onBackToLogin={() =>
-                                window.location.href = "/login"
-                            }
-                        />
-                    }
-                />
-
-                <Route
-                    path="*"
-                    element={<Navigate to="/login" />}
-                />
-            </Routes>
-        );
+function PublicOnlyRoute({ children }) {
+    const { isAuthenticated } = useAuth();
+    if (isAuthenticated) {
+        return <Navigate to="/dashboard" replace />;
     }
+    return children;
+}
 
+function AppRoutes() {
     return (
         <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-
+            {/* Public Auth Routes */}
             <Route
-                path="*"
-                element={<Navigate to="/dashboard" />}
+                path="/login"
+                element={
+                    <PublicOnlyRoute>
+                        <Login />
+                    </PublicOnlyRoute>
+                }
             />
+            <Route
+                path="/register"
+                element={
+                    <PublicOnlyRoute>
+                        <Register />
+                    </PublicOnlyRoute>
+                }
+            />
+
+            {/* Protected Workspace Routes (wrapped with Layout shell) */}
+            <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/subscriptions" element={<Subscriptions />} />
+                <Route path="/invoices" element={<Invoices />} />
+                <Route path="/credit-notes" element={<CreditNotes />} />
+                <Route path="/collaborators" element={<Collaborators />} />
+                <Route path="/overdue-alerts" element={<OverdueAlerts />} />
+            </Route>
+
+            {/* Default Catch-all */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
     );
 }
 
-function AppWithRouter() {
+function App() {
     return (
-        <BrowserRouter>
-            <App />
-        </BrowserRouter>
+        <AuthProvider>
+            <AppRoutes />
+        </AuthProvider>
     );
 }
 
-export default AppWithRouter;
+export default App;

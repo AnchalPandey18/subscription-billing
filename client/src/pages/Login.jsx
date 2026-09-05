@@ -111,21 +111,36 @@ function Login() {
                         </button>
                     </form>
 
-                    {/* Role Notice */}
-                    <div className="mt-6 pt-5 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px] text-slate-600">
-                        <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start gap-2">
-                            <Shield size={14} className="text-emerald-600 flex-shrink-0 mt-0.5" />
-                            <div>
-                                <span className="font-bold text-slate-800 block">Billing Admin</span>
-                                Lifecycle & bulk actions
-                            </div>
-                        </div>
-                        <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start gap-2">
-                            <UserCheck size={14} className="text-sky-600 flex-shrink-0 mt-0.5" />
-                            <div>
-                                <span className="font-bold text-slate-800 block">Account Manager</span>
-                                Subscriptions & drafts
-                            </div>
+                    {/* Demo Credentials */}
+                    <div className="mt-6 pt-5 border-t border-slate-100">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">Demo Credentials — click to autofill</p>
+                        <div className="grid grid-cols-1 gap-2 text-[11px] text-slate-600">
+                            <button
+                                type="button"
+                                onClick={() => { setEmail("billingadmin@test.com"); setPassword("Admin@123"); }}
+                                className="w-full p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 flex items-start gap-2 text-left hover:bg-emerald-100 hover:border-emerald-300 transition-colors cursor-pointer"
+                            >
+                                <Shield size={14} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+                                <div>
+                                    <span className="font-bold text-slate-800 block">Billing Admin</span>
+                                    <span className="text-slate-500">billingadmin@test.com</span>
+                                    <span className="text-slate-400 mx-1">·</span>
+                                    <span className="text-slate-500">Admin@123</span>
+                                </div>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => { setEmail("manager@test.com"); setPassword("Test@12345"); }}
+                                className="w-full p-2.5 rounded-lg bg-sky-50 border border-sky-200 flex items-start gap-2 text-left hover:bg-sky-100 hover:border-sky-300 transition-colors cursor-pointer"
+                            >
+                                <UserCheck size={14} className="text-sky-600 flex-shrink-0 mt-0.5" />
+                                <div>
+                                    <span className="font-bold text-slate-800 block">Account Manager</span>
+                                    <span className="text-slate-500">manager@test.com</span>
+                                    <span className="text-slate-400 mx-1">·</span>
+                                    <span className="text-slate-500">Test@12345</span>
+                                </div>
+                            </button>
                         </div>
                     </div>
 

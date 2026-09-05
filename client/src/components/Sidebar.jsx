@@ -105,7 +105,7 @@ function Sidebar({ mobileOpen = false, onCloseMobile = () => {} }) {
             </div>
 
             {/* Navigation */}
-            <div className="px-4 py-3 flex-1 overflow-y-auto">
+            <div className="px-4 py-3 flex-1 overflow-y-auto sidebar-scroll">
                 <p className="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     Menu
                 </p>
@@ -170,7 +170,7 @@ function Sidebar({ mobileOpen = false, onCloseMobile = () => {} }) {
     return (
         <>
             {/* Desktop Fixed Sidebar */}
-            <aside className="hidden lg:flex w-64 min-h-screen flex-col flex-shrink-0">
+            <aside className="hidden lg:flex w-64 h-screen flex-col flex-shrink-0 sticky top-0">
                 {sidebarContent}
             </aside>
 
